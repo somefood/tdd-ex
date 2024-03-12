@@ -31,9 +31,11 @@ public class NoteHighlightTest {
         assertThat(highlight("yes note1")).isEqualTo("yes note1");
         assertThat(highlight("yes notea")).isEqualTo("yes notea");
         assertThat(highlight("no a note")).isEqualTo("no a {note}");
-//        assertThat(highlight("no a note note")).isEqualTo("no a {note} {note}");
-//        assertThat(highlight("no a note anote")).isEqualTo("no a {note} anote");
-//        assertThat(highlight("no a note anote")).isEqualTo("no a {note} anote");
+        assertThat(highlight("no a note note")).isEqualTo("no a {note} {note}");
+        assertThat(highlight("no a note anote")).isEqualTo("no a {note} anote");
+        assertThat(highlight("no a note anote")).isEqualTo("no a {note} anote");
+        assertThat(highlight("no a note anote note")).isEqualTo("no a {note} anote {note}");
+        assertThat(highlight("no a note anote note 11")).isEqualTo("no a {note} anote {note} 11");
     }
 
     private String highlight(String str) {
@@ -43,19 +45,15 @@ public class NoteHighlightTest {
             if (idx == -1) {
                 result += str;
                 break;
-//                return str;
             }
-            if (isPrechNotSpace(str, idx)) {
-                result = str;
-                break;
+            if (isPrechNotSpace(str, idx) || isPostchNotSpace(str, idx)) {
+                result += str.substring(0, idx + "note".length());
+                str = str.substring(idx + "note".length());
+            } else {
+                String preStr = idx > 0 ? str.substring(0, idx) : "";
+                result += preStr + "{note}";
+                str = str.substring(idx + "note".length());
             }
-            if (isPostchNotSpace(str, idx)) {
-                result = str;
-                break;
-            }
-            String preStr = idx > 1 ? str.substring(0, idx) : "";
-            result += preStr + "{note}";
-            str = str.substring(idx + "note".length());
         }
         return result;
 //        return str.replace("note", "{note}");
